@@ -1,12 +1,22 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /games/{gameId} {
-      // 一覧は誰でも見られる
-      allow read: if true;
-      // 書き換えられるのは管理者アカウントだけ（firebase-config.js の adminEmail と同じにする）
-      allow write: if request.auth != null
+    // 書き換えられるのは管理者アカウントだけ（firebase-config.js の adminEmail と同じにする）
+    function isAdmin() {
+      return request.auth != null
         && request.auth.token.email == "takakura.yusaku.25@shizuoka.ac.jp";
+    }
+
+    // ゲームの一覧は誰でも見られる
+    match /games/{gameId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 動画（分けて保存したもの）も誰でも見られる
+    match /media/{mediaId}/chunks/{chunkId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
   }
 }

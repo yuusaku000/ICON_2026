@@ -1,4 +1,4 @@
-import { createStore, isDemo } from "./store.js";
+import { createStore, isDemo, MEDIA_MAX_BYTES } from "./store.js";
 import { siteTitle } from "./firebase-config.js";
 
 const $ = (sel) => document.querySelector(sel);
@@ -8,6 +8,10 @@ let games = [];
 let admin = false;
 let editing = null; // 編集中のゲーム（新規なら null）
 let thumbData = ""; // 編集フォームのサムネイル（data URL）
+let mediaFile = null; // 編集フォームで新しく選んだ動画
+let mediaRemoved = false; // 編集フォームで今の動画を外したか
+let detailToken = 0; // 詳細を開くたびに増やす（読み込みの遅れた動画を古い画面に出さないため）
+let detailMediaUrl = "";
 // テーマカラーの候補（編集画面の色ボタン）
 const DEFAULT_COLOR = "#3b5bfd";
 const PRESET_COLORS = [
@@ -153,6 +157,7 @@ async function move(i, dir) {
 // ---------- 詳細 ----------
 
 function openDetail(game) {
+  resetDetailMedia();
   applyTheme($("#detail"), themeColor(game));
   $("#d-thumb").replaceChildren(thumb(game));
   $("#d-title").textContent = game.title;
@@ -169,7 +174,50 @@ function openDetail(game) {
   }
   $("#detail").showModal();
   $("#detail .modal-inner").scrollTop = 0;
+  showDetailMedia(game);
 }
+
+// 動画が登録されていれば、読み込めたところでサムネイルと入れ替える
+async function showDetailMedia(game) {
+  const token = ++detailToken;
+  if (!game.media) return;
+  const box = $("#d-thumb");
+  box.classList.add("loading");
+  try {
+    const blob = await store.loadMedia(game.media);
+    if (token !== detailToken) return;
+    detailMediaUrl = URL.createObjectURL(blob);
+    let node;
+    if (blob.type.startsWith("video/")) {
+      node = el("video");
+      node.muted = true;
+      node.loop = true;
+      node.autoplay = true;
+      node.playsInline = true;
+    } else {
+      node = el("img");
+      node.alt = "";
+    }
+    node.src = detailMediaUrl;
+    const frame = el("div", "thumb media");
+    frame.append(node);
+    box.replaceChildren(frame);
+  } catch (err) {
+    console.error(err); // 読めなければサムネイルのまま
+  } finally {
+    if (token === detailToken) box.classList.remove("loading");
+  }
+}
+
+// 閉じたら動画を止めて片付ける（開き直したときにも念のため呼ぶ）
+function resetDetailMedia() {
+  detailToken++;
+  $("#d-thumb").replaceChildren();
+  $("#d-thumb").classList.remove("loading");
+  if (detailMediaUrl) URL.revokeObjectURL(detailMediaUrl);
+  detailMediaUrl = "";
+}
+$("#detail").addEventListener("close", resetDetailMedia);
 
 function fillSection(textSel, wrapSel, text) {
   $(textSel).textContent = text || "";
@@ -218,6 +266,9 @@ function openEditor(game) {
   form.elements.description.value = game?.description ?? "";
   setThumb(game?.thumb ?? "");
   setColor(themeColor(game));
+  mediaFile = null;
+  mediaRemoved = false;
+  showMediaName();
   $("#e-heading").textContent = game ? "ゲームを編集" : "ゲームを追加";
   $("#e-delete").hidden = !game;
   $("#e-error").textContent = "";
@@ -252,13 +303,27 @@ $("#edit-form").addEventListener("submit", async (e) => {
   };
   if (editing) data.id = editing.id;
 
+  const oldMedia = editing?.media ?? null;
+  data.media = mediaRemoved ? null : oldMedia;
+
   const save = $("#e-save");
   save.disabled = true;
   save.textContent = "保存中…";
+  let uploaded = null;
   try {
+    if (mediaFile) {
+      uploaded = await store.saveMedia(mediaFile, (p) => {
+        save.textContent = `動画を送信中… ${Math.round(p * 100)}%`;
+      });
+      data.media = uploaded;
+      save.textContent = "保存中…";
+    }
     await store.save(data);
+    // 差し替えたり外したりした古い動画は消す
+    if (oldMedia && oldMedia.id !== data.media?.id) store.removeMedia(oldMedia.id).catch(console.error);
     $("#editor").close();
   } catch (err) {
+    if (uploaded) store.removeMedia(uploaded.id).catch(console.error);
     showEditError(errorMessage(err));
   } finally {
     save.disabled = false;
@@ -270,6 +335,7 @@ $("#e-delete").addEventListener("click", async () => {
   if (!editing || !confirm(`「${editing.title}」を削除しますか？`)) return;
   try {
     await store.remove(editing.id);
+    if (editing.media) store.removeMedia(editing.media.id).catch(console.error);
     $("#editor").close();
   } catch (err) {
     showEditError(errorMessage(err));
@@ -282,6 +348,37 @@ function showEditError(text) {
 
 function nextOrder() {
   return games.length ? Math.max(...games.map((g) => g.order ?? 0)) + 1 : 0;
+}
+
+// 動画：ファイルを選ぶか、外す
+$("#media-pick").addEventListener("click", () => $("#media-file").click());
+$("#media-file").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  if (!/^(image\/(gif|webp)|video\/)/.test(file.type)) return showEditError("GIF・WebP か動画のファイルを選んでください");
+  if (file.size > MEDIA_MAX_BYTES) {
+    return showEditError(`動画が大きすぎます（${formatSize(file.size)}）。15MB までにしてください。GIF は MP4 にするとかなり小さくなります`);
+  }
+  showEditError("");
+  mediaFile = file;
+  showMediaName();
+});
+$("#media-clear").addEventListener("click", () => {
+  if (mediaFile) mediaFile = null;
+  else mediaRemoved = true;
+  showMediaName();
+});
+
+function showMediaName() {
+  const current = mediaRemoved ? null : editing?.media;
+  const shown = mediaFile ?? current;
+  $("#media-name").textContent = shown ? `${shown.name}（${formatSize(shown.size)}）` : "なし";
+  $("#media-clear").hidden = !shown;
+}
+
+function formatSize(bytes) {
+  return bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)}MB` : `${Math.ceil(bytes / 1024)}KB`;
 }
 
 // テーマカラー：候補のボタンか、「自由に選ぶ」で色を決める

@@ -92,6 +92,16 @@
         <button id="thumb-clear" type="button" class="ghost small" hidden>サムネイルを外す</button>
       </div>
       <div class="field">
+        <span>動画（GIF・MP4 など。なくてもよい）</span>
+        <p class="hint">ゲームを開いた画面で、サムネイルのかわりに流れます（15MB まで）</p>
+        <div class="media-row">
+          <button id="media-pick" type="button" class="ghost small">ファイルを選ぶ</button>
+          <span id="media-name" class="media-name">なし</span>
+          <button id="media-clear" type="button" class="ghost small" hidden>外す</button>
+        </div>
+        <input id="media-file" type="file" accept="image/gif,image/webp,video/*" hidden>
+      </div>
+      <div class="field">
         <span>テーマカラー</span>
         <div id="swatches" class="swatches">
           <label class="swatch custom" title="自由に選ぶ">

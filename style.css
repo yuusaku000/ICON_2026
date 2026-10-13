@@ -245,7 +245,22 @@ main { flex: 1; width: min(1200px, 100%); margin: 0 auto; padding: 0.5rem 1rem 2
   line-height: 1;
 }
 
+.d-thumb { position: relative; }
 .d-thumb .thumb { border-radius: 0; }
+/* 動画は切らずに全体を見せる */
+.thumb.media { background: #000; }
+.thumb.media img, .thumb.media video { width: 100%; height: 100%; object-fit: contain; display: block; }
+.d-thumb.loading::after {
+  content: "動画を読み込み中…";
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  padding: 0.2em 0.7em;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.6);
+  color: #fff;
+  font-size: 0.8rem;
+}
 .d-body { padding: 1.25rem 1.5rem 0.5rem; }
 .d-body h2 { margin: 0 0 1rem; font-size: 1.5rem; overflow-wrap: anywhere; }
 .d-body section { margin-bottom: 1.5rem; }
@@ -350,6 +365,11 @@ main { flex: 1; width: min(1200px, 100%); margin: 0 auto; padding: 0.5rem 1rem 2
 .swatch.custom input::-webkit-color-swatch-wrapper { padding: 0; }
 .swatch.custom input::-webkit-color-swatch { border: 0; border-radius: 50%; }
 .swatch.custom input::-moz-color-swatch { border: 0; border-radius: 50%; }
+
+.hint { margin: 0; color: var(--muted); font-size: 0.8rem; font-weight: 400; }
+.media-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+.media-name { font-weight: 400; overflow-wrap: anywhere; }
+.media-row [hidden] { display: none; }
 
 .error { margin: 0; min-height: 1.2em; color: var(--danger); font-size: 0.9rem; }
 
