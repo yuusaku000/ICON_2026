@@ -10,7 +10,7 @@ export const firebaseConfig = {
 };
 
 // 編集用に作った管理者アカウントのメールアドレス（編集画面ではパスワードだけを聞きます）
-export const adminEmail = "";
+export const adminEmail = "takakura.yusaku.25@shizuoka.ac.jp";
 
 // ハブの名前
 export const siteTitle = "ゲームハブ";

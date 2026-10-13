@@ -364,7 +364,7 @@ function loginMessage(err) {
 
 function errorMessage(err) {
   console.error(err);
-  if (err.code === "permission-denied") return "保存する権限がありません。firestore.rules の UID を確認してください";
+  if (err.code === "permission-denied") return "保存する権限がありません。firestore.rules のメールアドレスを確認してください";
   return "保存できませんでした（" + (err.code || err.message) + "）";
 }
 
