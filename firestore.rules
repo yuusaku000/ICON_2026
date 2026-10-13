@@ -1,0 +1,11 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /games/{gameId} {
+      // 一覧は誰でも見られる
+      allow read: if true;
+      // 書き換えられるのは管理者アカウントだけ（UID は Authentication の「ユーザー」画面でコピーできる）
+      allow write: if request.auth != null && request.auth.uid == "ここに管理者のUIDを貼る";
+    }
+  }
+}
