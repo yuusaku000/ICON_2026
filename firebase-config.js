@@ -13,4 +13,4 @@ export const firebaseConfig = {
 export const adminEmail = "takakura.yusaku.25@shizuoka.ac.jp";
 
 // ハブの名前
-export const siteTitle = "ゲームハブ";
+export const siteTitle = "ゲームセンター";
