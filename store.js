@@ -3,7 +3,8 @@ import { firebaseConfig, adminEmail } from "./firebase-config.js";
 
 const SDK = "https://www.gstatic.com/firebasejs/10.14.1";
 
-export const isDemo = !firebaseConfig.apiKey;
+// URL に ?demo を付けると、本番のデータに触れずに試せる
+export const isDemo = !firebaseConfig.apiKey || new URLSearchParams(location.search).has("demo");
 
 export function createStore() {
   return isDemo ? demoStore() : firebaseStore();

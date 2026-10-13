@@ -8,6 +8,20 @@ let games = [];
 let admin = false;
 let editing = null; // 編集中のゲーム（新規なら null）
 let thumbData = ""; // 編集フォームのサムネイル（data URL）
+// テーマカラーの候補（編集画面の色ボタン）
+const DEFAULT_COLOR = "#3b5bfd";
+const PRESET_COLORS = [
+  ["#3b5bfd", "青"],
+  ["#12a594", "青緑"],
+  ["#30a46c", "緑"],
+  ["#f5b800", "黄"],
+  ["#f76b15", "オレンジ"],
+  ["#e5484d", "赤"],
+  ["#e93d82", "ピンク"],
+  ["#8e4ec6", "紫"],
+  ["#5b6070", "グレー"],
+];
+
 let loaded = false; // 一覧が一度でも届いたか
 let loadError = "";
 
@@ -75,6 +89,7 @@ function setStatus(text) {
 
 function card(game, i) {
   const li = el("li", "card");
+  applyTheme(li, themeColor(game));
   const open = el("button", "card-open");
   open.type = "button";
   open.append(thumb(game), el("span", "card-title", game.title));
@@ -138,6 +153,7 @@ async function move(i, dir) {
 // ---------- 詳細 ----------
 
 function openDetail(game) {
+  applyTheme($("#detail"), themeColor(game));
   $("#d-thumb").replaceChildren(thumb(game));
   $("#d-title").textContent = game.title;
   fillSection("#d-controls", "#d-controls-wrap", game.controls);
@@ -201,6 +217,7 @@ function openEditor(game) {
   form.elements.controls.value = game?.controls ?? "";
   form.elements.description.value = game?.description ?? "";
   setThumb(game?.thumb ?? "");
+  setColor(themeColor(game));
   $("#e-heading").textContent = game ? "ゲームを編集" : "ゲームを追加";
   $("#e-delete").hidden = !game;
   $("#e-error").textContent = "";
@@ -230,6 +247,7 @@ $("#edit-form").addEventListener("submit", async (e) => {
     controls: form.elements.controls.value.trim(),
     description: form.elements.description.value.trim(),
     thumb: thumbData,
+    color: $("#color").value,
     order: editing ? editing.order : nextOrder(),
   };
   if (editing) data.id = editing.id;
@@ -264,6 +282,28 @@ function showEditError(text) {
 
 function nextOrder() {
   return games.length ? Math.max(...games.map((g) => g.order ?? 0)) + 1 : 0;
+}
+
+// テーマカラー：候補のボタンか、「自由に選ぶ」で色を決める
+for (const [color, name] of PRESET_COLORS) {
+  const b = el("button", "swatch");
+  b.type = "button";
+  b.dataset.color = color;
+  b.title = name;
+  b.setAttribute("aria-label", name);
+  b.style.background = color;
+  b.addEventListener("click", () => setColor(color));
+  $("#swatches .custom").before(b);
+}
+$("#color").addEventListener("input", (e) => setColor(e.target.value));
+
+function setColor(color) {
+  $("#color").value = color;
+  const preset = PRESET_COLORS.some(([c]) => c === color);
+  for (const b of document.querySelectorAll("#swatches button")) {
+    b.setAttribute("aria-pressed", b.dataset.color === color);
+  }
+  $("#swatches .custom").classList.toggle("selected", !preset);
 }
 
 // サムネイル：クリック・ドラッグ・貼り付けのどれでも
@@ -336,6 +376,21 @@ for (const dialog of document.querySelectorAll("dialog")) {
   dialog.addEventListener("click", (e) => {
     if (e.target === dialog || e.target.closest("[data-close]")) dialog.close();
   });
+}
+
+function themeColor(game) {
+  return /^#[0-9a-f]{6}$/i.test(game?.color ?? "") ? game.color : DEFAULT_COLOR;
+}
+
+// テーマカラーと、その上に載せる文字の色（白か黒の読みやすいほう）を設定する
+function applyTheme(node, color) {
+  const [r, g, b] = [1, 3, 5].map((i) => {
+    const c = parseInt(color.slice(i, i + 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  node.style.setProperty("--theme", color);
+  node.style.setProperty("--on-theme", luminance > 0.179 ? "#14161f" : "#ffffff");
 }
 
 function isWebUrl(text) {

@@ -37,7 +37,7 @@ Python が入っていれば、このフォルダで次を実行して http://lo
 python -m http.server 8765
 ```
 
-`firebase-config.js` が空のあいだはデモモードです。データはそのブラウザの中だけに保存され、編集パスワードは `demo` です。
+`firebase-config.js` が空のあいだ、または URL の最後に `?demo` を付けて開いたときはデモモードです。データはそのブラウザの中だけに保存され、編集パスワードは `demo` です。
 
 ## 3. 公開する（GitHub Pages）
 

@@ -37,13 +37,13 @@
       <div id="d-thumb" class="d-thumb"></div>
       <div class="d-body">
         <h2 id="d-title"></h2>
-        <section id="d-controls-wrap">
-          <h3>操作方法</h3>
-          <p id="d-controls" class="pre"></p>
-        </section>
         <section id="d-desc-wrap">
           <h3>説明</h3>
           <p id="d-desc" class="pre"></p>
+        </section>
+        <section id="d-controls-wrap">
+          <h3>操作方法</h3>
+          <p id="d-controls" class="pre"></p>
         </section>
       </div>
       <div class="d-foot">
@@ -87,11 +87,20 @@
         <input id="file" type="file" accept="image/*" hidden>
         <button id="thumb-clear" type="button" class="ghost small" hidden>サムネイルを外す</button>
       </div>
-      <label>操作方法
-        <textarea name="controls" rows="3" placeholder="矢印キー：移動　スペース：ジャンプ"></textarea>
-      </label>
+      <div class="field">
+        <span>テーマカラー</span>
+        <div id="swatches" class="swatches">
+          <label class="swatch custom" title="自由に選ぶ">
+            <input id="color" type="color" name="color" value="#3b5bfd">
+            <span>自由に選ぶ</span>
+          </label>
+        </div>
+      </div>
       <label>説明
         <textarea name="description" rows="5"></textarea>
+      </label>
+      <label>操作方法
+        <textarea name="controls" rows="3" placeholder="矢印キー：移動　スペース：ジャンプ"></textarea>
       </label>
       <p id="e-error" class="error"></p>
       <div class="actions">
