@@ -24,9 +24,15 @@ async function firebaseStore() {
 
   return {
     subscribe(onGames, onError) {
+      // つながらないと手元の空データを返してくるので、サーバーから一度届くまでは渡さない
+      let reachedServer = false;
       return fs.onSnapshot(
         fs.query(games, fs.orderBy("order")),
-        (snap) => onGames(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+        { includeMetadataChanges: true },
+        (snap) => {
+          if (!snap.metadata.fromCache) reachedServer = true;
+          if (reachedServer) onGames(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        },
         onError,
       );
     },

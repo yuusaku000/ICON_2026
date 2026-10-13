@@ -8,6 +8,8 @@ let games = [];
 let admin = false;
 let editing = null; // 編集中のゲーム（新規なら null）
 let thumbData = ""; // 編集フォームのサムネイル（data URL）
+let loaded = false; // 一覧が一度でも届いたか
+let loadError = "";
 
 document.title = siteTitle;
 $("#site-title").textContent = siteTitle;
@@ -15,16 +17,24 @@ $("#demo-banner").hidden = !isDemo;
 
 // ---------- 起動 ----------
 
+// Firestore がまだ無いときなどは、エラーにならずに待ち続けるので、時間で見切る
+const loadTimer = setTimeout(() => {
+  failLoad("データベースにつながりません。Firestore Database が作られているか確認してください。");
+}, 10000);
+
 try {
   store = await createStore();
   store.subscribe(
     (list) => {
       games = list;
+      loaded = true;
+      loadError = "";
+      clearTimeout(loadTimer);
       render();
     },
     (err) => {
       console.error(err);
-      setStatus("ゲームの一覧を読み込めませんでした。Firestore の設定（ルール）を確認してください。");
+      failLoad("ゲームの一覧を読み込めませんでした。Firestore のルールを確認してください。");
     },
   );
   store.onAuth((isAdmin) => {
@@ -33,7 +43,14 @@ try {
   });
 } catch (err) {
   console.error(err);
-  setStatus("読み込めませんでした。firebase-config.js の値を確認してください。");
+  failLoad("読み込めませんでした。firebase-config.js の値を確認してください。");
+}
+
+function failLoad(message) {
+  clearTimeout(loadTimer);
+  if (loaded) return;
+  loadError = message;
+  render();
 }
 
 // ---------- 一覧 ----------
@@ -46,7 +63,9 @@ function render() {
 
   $("#admin-bar").hidden = !admin;
   $("#edit-link").hidden = admin;
-  setStatus(games.length || admin ? "" : "まだゲームがありません");
+  if (loadError) setStatus(loadError);
+  else if (!loaded) setStatus("読み込み中…");
+  else setStatus(games.length || admin ? "" : "まだゲームがありません");
 }
 
 function setStatus(text) {
