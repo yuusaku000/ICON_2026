@@ -97,7 +97,23 @@ main { flex: 1; width: min(1200px, 100%); margin: 0 auto; padding: 0.5rem 1rem 2
 
 .status { color: var(--muted); text-align: center; padding: 3rem 0; }
 
-.foot { display: flex; justify-content: flex-end; padding: 0.5rem 1rem 1rem; }
+.foot { display: flex; justify-content: space-between; align-items: flex-end; padding: 0.5rem 1rem 1rem; }
+
+/* 左下のサークルのマーク */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  opacity: 0.3;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.25em;
+  user-select: none;
+}
+.brand img { height: 3rem; width: auto; display: block; }
+@media (prefers-color-scheme: dark) {
+  .brand img { filter: invert(1); }
+}
 .edit-link {
   background: none;
   color: var(--muted);
