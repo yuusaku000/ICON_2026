@@ -12,6 +12,8 @@ let mediaFile = null; // 編集フォームで新しく選んだ動画
 let mediaRemoved = false; // 編集フォームで今の動画を外したか
 let detailToken = 0; // 詳細を開くたびに増やす（読み込みの遅れた動画を古い画面に出さないため）
 let detailMediaUrl = "";
+let editorStart = ""; // 編集画面を開いたときの入力内容（閉じるときに、変更があるかを調べる）
+let editingStamp = ""; // 編集を始めたときのゲームの中身（ほかの人の変更に気づくため）
 // テーマカラーの候補（編集画面の色ボタン）
 const DEFAULT_COLOR = "#3b5bfd";
 const PRESET_COLORS = [
@@ -80,6 +82,7 @@ function render() {
   grid.classList.toggle("editing", admin);
 
   $("#admin-bar").hidden = !admin;
+  $("#admin-guide").hidden = !admin;
   $("#edit-link").hidden = admin;
   if (loadError) setStatus(loadError);
   else if (!loaded) setStatus("読み込み中…");
@@ -156,8 +159,9 @@ async function move(i, dir) {
 
 // ---------- 詳細 ----------
 
-function openDetail(game) {
+function openDetail(game, { preview = false } = {}) {
   resetDetailMedia();
+  $("#d-preview").hidden = !preview;
   applyTheme($("#detail"), themeColor(game));
   $("#d-thumb").replaceChildren(thumb(game));
   $("#d-title").textContent = game.title;
@@ -180,11 +184,11 @@ function openDetail(game) {
 // 動画が登録されていれば、読み込めたところでサムネイルと入れ替える
 async function showDetailMedia(game) {
   const token = ++detailToken;
-  if (!game.media) return;
+  if (!game.media && !game.mediaBlob) return;
   const box = $("#d-thumb");
   box.classList.add("loading");
   try {
-    const blob = await store.loadMedia(game.media);
+    const blob = game.mediaBlob ?? (await store.loadMedia(game.media));
     if (token !== detailToken) return;
     detailMediaUrl = URL.createObjectURL(blob);
     let node;
@@ -269,11 +273,59 @@ function openEditor(game) {
   mediaFile = null;
   mediaRemoved = false;
   showMediaName();
-  $("#e-heading").textContent = game ? "ゲームを編集" : "ゲームを追加";
-  $("#e-delete").hidden = !game;
-  $("#e-error").textContent = "";
+  $("#e-heading").textContent = game ? `「${game.title}」を編集` : "ゲームを追加";
+  $("#e-delete-wrap").hidden = !game;
+  showEditError("");
+  editorStart = formSnapshot();
+  editingStamp = game ? stamp(game) : "";
   $("#editor").showModal();
+  $("#edit-form .e-body").scrollTop = 0;
+  if (!game) form.elements.title.focus();
 }
+
+// 入力欄の今の中身（変更があったかを比べるため）
+function formSnapshot() {
+  const f = $("#edit-form").elements;
+  return JSON.stringify([
+    f.title.value, f.url.value, f.controls.value, f.description.value,
+    thumbData, $("#color").value, mediaFile?.name ?? null, mediaRemoved,
+  ]);
+}
+
+// 並び順だけの変更は、ほかの人の変更として数えない
+function stamp(game) {
+  return JSON.stringify({ ...game, order: null });
+}
+
+function requestCloseEditor() {
+  if (formSnapshot() !== editorStart && !confirm("保存していない変更があります。保存せずに閉じますか？")) return;
+  $("#editor").close();
+}
+
+// Esc キーで閉じるときも、確認を挟む
+$("#editor").addEventListener("cancel", (e) => {
+  e.preventDefault();
+  requestCloseEditor();
+});
+
+// 見え方を確認：保存する前の内容で、遊ぶ人に見える画面を開く
+$("#e-preview").addEventListener("click", () => {
+  const f = $("#edit-form").elements;
+  const keepMedia = !mediaRemoved && !mediaFile ? editing?.media : null;
+  openDetail(
+    {
+      title: f.title.value.trim() || "（タイトル未入力）",
+      url: f.url.value.trim(),
+      controls: f.controls.value.trim(),
+      description: f.description.value.trim(),
+      thumb: thumbData,
+      color: $("#color").value,
+      media: keepMedia,
+      mediaBlob: mediaFile,
+    },
+    { preview: true },
+  );
+});
 
 function setThumb(data) {
   thumbData = data;
@@ -289,8 +341,16 @@ $("#edit-form").addEventListener("submit", async (e) => {
   const form = e.currentTarget;
   const title = form.elements.title.value.trim();
   const url = form.elements.url.value.trim();
-  if (!title) return showEditError("タイトルを入れてください");
-  if (!isWebUrl(url)) return showEditError("URL は https:// から始まる形で入れてください");
+  if (!title) return showEditError("タイトルを入れてください", form.elements.title);
+  if (!isWebUrl(url)) return showEditError("URL は https:// から始まる形で入れてください", form.elements.url);
+
+  // 編集している間に、ほかの人が同じゲームを変えたり消したりしていないか
+  const latest = editing ? games.find((g) => g.id === editing.id) : null;
+  if (editing && !latest) {
+    if (!confirm("このゲームは、ほかの人が削除しました。保存すると、もう一度追加されます。保存しますか？")) return;
+  } else if (latest && stamp(latest) !== editingStamp) {
+    if (!confirm("あなたが編集している間に、ほかの人がこのゲームを変更しました。保存すると、その変更は上書きされます。保存しますか？")) return;
+  }
 
   const data = {
     title,
@@ -299,11 +359,11 @@ $("#edit-form").addEventListener("submit", async (e) => {
     description: form.elements.description.value.trim(),
     thumb: thumbData,
     color: $("#color").value,
-    order: editing ? editing.order : nextOrder(),
+    order: latest ? latest.order : nextOrder(), // 並べ替えられていても、今の位置のまま
   };
   if (editing) data.id = editing.id;
 
-  const oldMedia = editing?.media ?? null;
+  const oldMedia = latest?.media ?? null;
   data.media = mediaRemoved ? null : oldMedia;
 
   const save = $("#e-save");
@@ -322,6 +382,7 @@ $("#edit-form").addEventListener("submit", async (e) => {
     // 差し替えたり外したりした古い動画は消す
     if (oldMedia && oldMedia.id !== data.media?.id) store.removeMedia(oldMedia.id).catch(console.error);
     $("#editor").close();
+    showToast(editing ? "保存しました。全員の画面に反映されます" : "追加しました。全員の画面に反映されます");
   } catch (err) {
     if (uploaded) store.removeMedia(uploaded.id).catch(console.error);
     showEditError(errorMessage(err));
@@ -332,18 +393,33 @@ $("#edit-form").addEventListener("submit", async (e) => {
 });
 
 $("#e-delete").addEventListener("click", async () => {
-  if (!editing || !confirm(`「${editing.title}」を削除しますか？`)) return;
+  if (!editing || !confirm(`「${editing.title}」を削除します。遊ぶ人の一覧からも消えます。よろしいですか？`)) return;
   try {
     await store.remove(editing.id);
     if (editing.media) store.removeMedia(editing.media.id).catch(console.error);
     $("#editor").close();
+    showToast(`「${editing.title}」を削除しました`);
   } catch (err) {
     showEditError(errorMessage(err));
   }
 });
 
-function showEditError(text) {
+function showEditError(text, field = null) {
   $("#e-error").textContent = text;
+  for (const input of $("#edit-form").querySelectorAll("[aria-invalid]")) input.removeAttribute("aria-invalid");
+  if (field) {
+    field.setAttribute("aria-invalid", "true");
+    field.focus();
+  }
+}
+
+let toastTimer = 0;
+function showToast(text) {
+  const toast = $("#toast");
+  toast.textContent = text;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("show"), 3000);
 }
 
 function nextOrder() {
@@ -468,10 +544,12 @@ async function shrinkImage(file) {
 
 // ---------- 共通 ----------
 
-// 背景クリックか「閉じる」系のボタンでダイアログを閉じる
+// 編集画面だけは、入力が消えないよう外側を押しても閉じず、キャンセルでは確認を挟む
 for (const dialog of document.querySelectorAll("dialog")) {
+  const isEditor = dialog.id === "editor";
   dialog.addEventListener("click", (e) => {
-    if (e.target === dialog || e.target.closest("[data-close]")) dialog.close();
+    if (e.target.closest("[data-close]")) isEditor ? requestCloseEditor() : dialog.close();
+    else if (e.target === dialog && !isEditor) dialog.close();
   });
 }
 

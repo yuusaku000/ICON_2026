@@ -396,3 +396,121 @@ main { flex: 1; width: min(1200px, 100%); margin: 0 auto; padding: 0.5rem 1rem 2
   .d-body { padding: 1rem 1rem 0.25rem; }
   .d-foot { padding: 0.75rem 1rem 1rem; }
 }
+
+/* ---------- 編集画面 ---------- */
+
+/* 見出しと「保存」の並びは固定し、真ん中だけスクロールする */
+.editor-form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0;
+  gap: 0;
+}
+.e-head { padding: 1.25rem 1.5rem 0.9rem; border-bottom: 1px solid var(--border); }
+.e-head h2 { overflow-wrap: anywhere; }
+.e-head .hint { margin-top: 0.25rem; }
+.e-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+.e-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem 1rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.e-foot .error:empty { display: none; }
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  margin: 0;
+  padding: 1rem 1.1rem 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.group legend {
+  padding: 0 0.4rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.form .field-label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+.req {
+  padding: 0.05em 0.5em;
+  border-radius: 4px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.form [aria-invalid="true"] { border-color: var(--danger); box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger) 35%, transparent); }
+
+.danger-zone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.8rem;
+  padding-top: 0.25rem;
+}
+.danger-zone[hidden] { display: none; }
+
+/* 編集中の案内 */
+.admin-guide {
+  margin-bottom: 1.25rem;
+  padding: 0.8rem 1rem;
+  border-left: 5px solid var(--accent);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  font-size: 0.9rem;
+}
+.admin-guide[hidden] { display: none; }
+
+/* 見え方の確認中の目印 */
+.preview-badge {
+  margin: 0;
+  padding: 0.5rem 4.5rem 0.5rem 1rem;
+  background: #fff4c7;
+  color: #5a4600;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.preview-badge[hidden] { display: none; }
+
+/* 保存したときのお知らせ */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.5rem;
+  z-index: 10;
+  max-width: calc(100% - 2rem);
+  padding: 0.7rem 1.2rem;
+  border-radius: 999px;
+  background: #1f2330;
+  color: #fff;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.3);
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 1rem);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }

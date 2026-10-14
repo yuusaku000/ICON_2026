@@ -22,6 +22,11 @@
   </header>
 
   <main>
+    <div id="admin-guide" class="admin-guide" hidden>
+      <b>編集中です。</b>
+      カードを押すと、そのゲームを直せます。◀ ▶ で並び順を変えられます。
+      保存した内容は、すぐに全員の画面に反映されます。終わったら「編集を終える」を押してください。
+    </div>
     <p id="status" class="status">読み込み中…</p>
     <ul id="grid" class="grid"></ul>
   </main>
@@ -41,6 +46,7 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
     </button>
     <div class="modal-inner">
+      <p id="d-preview" class="preview-badge" hidden>見え方の確認中（まだ保存されていません）</p>
       <div id="d-thumb" class="d-thumb"></div>
       <div class="d-body">
         <h2 id="d-title"></h2>
@@ -76,57 +82,94 @@
   </dialog>
 
   <!-- ゲームの追加・編集 -->
-  <dialog id="editor" class="modal">
-    <form id="edit-form" class="modal-inner form" novalidate>
-      <h2 id="e-heading">ゲームを追加</h2>
-      <label>タイトル
-        <input name="title" required maxlength="60">
-      </label>
-      <label>unityroom の URL
-        <input name="url" type="url" required placeholder="https://unityroom.com/games/...">
-      </label>
-      <div class="field">
-        <span>サムネイル</span>
-        <div id="drop" class="drop" tabindex="0" role="button" aria-label="サムネイル画像を選ぶ">
-          <img id="e-thumb" alt="" hidden>
-          <p id="drop-hint">画像をドラッグ、クリックで選ぶ、または貼り付け（Ctrl+V）</p>
-        </div>
-        <input id="file" type="file" accept="image/*" hidden>
-        <button id="thumb-clear" type="button" class="ghost small" hidden>サムネイルを外す</button>
+  <dialog id="editor" class="modal editor">
+    <form id="edit-form" class="form editor-form" novalidate>
+      <div class="e-head">
+        <h2 id="e-heading">ゲームを追加</h2>
+        <p class="hint">「必須」の2つだけ入れれば保存できます。あとから何度でも直せます。</p>
       </div>
-      <div class="field">
-        <span>動画（GIF・MP4 など。なくてもよい）</span>
-        <p class="hint">ゲームを開いた画面で、サムネイルのかわりに流れます（15MB まで）</p>
-        <div class="media-row">
-          <button id="media-pick" type="button" class="ghost small">ファイルを選ぶ</button>
-          <span id="media-name" class="media-name">なし</span>
-          <button id="media-clear" type="button" class="ghost small" hidden>外す</button>
+
+      <div class="e-body">
+        <fieldset class="group">
+          <legend>基本</legend>
+          <div class="field">
+            <label class="field-label" for="e-title">タイトル <span class="req">必須</span></label>
+            <p class="hint">一覧のカードと、ゲームを開いた画面に出る名前です</p>
+            <input id="e-title" name="title" maxlength="60" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="field-label" for="e-url">unityroom の URL <span class="req">必須</span></label>
+            <p class="hint">unityroom でゲームのページを開き、上のアドレス欄の URL をコピーして貼ります</p>
+            <input id="e-url" name="url" type="url" placeholder="https://unityroom.com/games/..." autocomplete="off">
+          </div>
+        </fieldset>
+
+        <fieldset class="group">
+          <legend>見た目</legend>
+          <div class="field">
+            <span class="field-label">サムネイル</span>
+            <p class="hint">一覧のカードに出る画像です。横長（16:9）だときれいに収まります</p>
+            <div id="drop" class="drop" tabindex="0" role="button" aria-label="サムネイル画像を選ぶ">
+              <img id="e-thumb" alt="" hidden>
+              <p id="drop-hint">ここを押して画像を選ぶ<br>（ドラッグや Ctrl+V の貼り付けでも入れられます）</p>
+            </div>
+            <input id="file" type="file" accept="image/*" hidden>
+            <button id="thumb-clear" type="button" class="ghost small" hidden>サムネイルを外す</button>
+          </div>
+          <div class="field">
+            <span class="field-label">動画（GIF・MP4 など）</span>
+            <p class="hint">ゲームを開いた画面で、サムネイルのかわりに流れます。なくてもかまいません（15MB まで）</p>
+            <div class="media-row">
+              <button id="media-pick" type="button" class="ghost small">ファイルを選ぶ</button>
+              <span id="media-name" class="media-name">なし</span>
+              <button id="media-clear" type="button" class="ghost small" hidden>外す</button>
+            </div>
+            <input id="media-file" type="file" accept="image/gif,image/webp,video/*" hidden>
+          </div>
+          <div class="field">
+            <span class="field-label">テーマカラー</span>
+            <p class="hint">カードの下の帯、見出しの線、「遊ぶ」ボタンの色になります</p>
+            <div id="swatches" class="swatches">
+              <label class="swatch custom" title="自由に選ぶ">
+                <input id="color" type="color" name="color" value="#3b5bfd">
+                <span>自由に選ぶ</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="group">
+          <legend>文章</legend>
+          <div class="field">
+            <label class="field-label" for="e-desc">説明</label>
+            <p class="hint">どんなゲームかを書きます。改行はそのまま表示されます</p>
+            <textarea id="e-desc" name="description" rows="5"></textarea>
+          </div>
+          <div class="field">
+            <label class="field-label" for="e-controls">操作方法</label>
+            <p class="hint">1行に1つずつ書くと読みやすくなります</p>
+            <textarea id="e-controls" name="controls" rows="3" placeholder="矢印キー：移動&#10;スペース：ジャンプ"></textarea>
+          </div>
+        </fieldset>
+
+        <div id="e-delete-wrap" class="danger-zone">
+          <button id="e-delete" type="button" class="danger small">このゲームを削除</button>
+          <p class="hint">一覧から消えます（3時間ごとのバックアップからは戻せます）</p>
         </div>
-        <input id="media-file" type="file" accept="image/gif,image/webp,video/*" hidden>
       </div>
-      <div class="field">
-        <span>テーマカラー</span>
-        <div id="swatches" class="swatches">
-          <label class="swatch custom" title="自由に選ぶ">
-            <input id="color" type="color" name="color" value="#3b5bfd">
-            <span>自由に選ぶ</span>
-          </label>
+
+      <div class="e-foot">
+        <p id="e-error" class="error" role="alert"></p>
+        <div class="actions">
+          <button id="e-preview" type="button" class="ghost">見え方を確認</button>
+          <span class="spacer"></span>
+          <button type="button" class="ghost" data-close>キャンセル</button>
+          <button id="e-save" type="submit">保存</button>
         </div>
-      </div>
-      <label>説明
-        <textarea name="description" rows="5"></textarea>
-      </label>
-      <label>操作方法
-        <textarea name="controls" rows="3" placeholder="矢印キー：移動　スペース：ジャンプ"></textarea>
-      </label>
-      <p id="e-error" class="error"></p>
-      <div class="actions">
-        <button id="e-delete" type="button" class="danger">削除</button>
-        <span class="spacer"></span>
-        <button type="button" class="ghost" data-close>キャンセル</button>
-        <button id="e-save" type="submit">保存</button>
       </div>
     </form>
   </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

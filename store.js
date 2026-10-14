@@ -115,6 +115,14 @@ async function demoStore() {
     } catch {}
     emitGames();
   };
+  // 別のタブでの変更も反映する（2人で同時に編集したときの確認用）
+  addEventListener("storage", (e) => {
+    if (e.key !== KEY) return;
+    try {
+      games = JSON.parse(e.newValue) || [];
+    } catch {}
+    emitGames();
+  });
 
   return {
     subscribe(onGames) {
