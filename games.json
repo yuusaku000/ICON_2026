@@ -1,0 +1,57 @@
+[
+  {
+    "color": "#000000",
+    "controls": "",
+    "description": "遊べるゲームが、一覧で表示されています。\n選択すると、説明と遊び方が見れます。\n右上の✘から一覧に戻れます。\n「遊ぶ」を押すと、ゲームを遊べるサイトに移動します。\n\nサイトでは、ゲーム画面の下の「フルスクリーン表示」で大きく表示できます。\nEscキー(キーボード左上)で通常のサイズに戻せます。\nブラウザの戻るボタン(左上の【←】)、またはタブを選択することで、ゲーム一覧に戻れます。",
+    "id": "0BJ59dM5FWmc64Mknism",
+    "media": null,
+    "order": 0,
+    "thumb": "",
+    "title": "ゲームセンターの遊び方",
+    "url": "https://yuusaku000.github.io/ICON_2026/"
+  },
+  {
+    "color": "#e5484d",
+    "controls": "移動 W A S D（矢印キーも可）\n視点 マウス\n撃つ 左クリック\n構える 右クリック（長押し）\nダッシュ 左Shift\nジャンプ Space\n\n銃を隠す V\nミニマップ M\n一時停止 Esc\n\n▼ タイトル画面\n1 / 2 / 3 モードを選ぶ\nSpace 最初のモードで開始\nH 遊び方\n\n▼  ゲームオーバー後\nR もう一度\nT タイトルへ\n\n音量はタイトル画面の右下で調整できます。",
+    "description": "インベーダーゲームを３Dにしました！\nマウス操作推奨です！！",
+    "id": "aN0cYOt3hX1FgtOoAG35",
+    "media": {
+      "chunks": 7,
+      "id": "c7a35b27-3f5d-47b0-9c46-e9357f72db6e",
+      "name": "インベーダーゲーム.mp4",
+      "size": 6287609,
+      "type": "video/mp4"
+    },
+    "order": 1,
+    "thumb": "thumbs/aN0cYOt3hX1FgtOoAG35.jpg",
+    "title": "３Dインベーダーゲーム",
+    "url": "https://unityroom.com/games/3dinvadergame"
+  },
+  {
+    "color": "#f76b15",
+    "controls": "タップ、タイピング",
+    "description": "最後に「力」のつく単語を３つ入れて、力を誇示しよう！！！",
+    "id": "QTiMvsnXTE4YYowI0BB8",
+    "media": {
+      "chunks": 9,
+      "id": "b9f677b5-56eb-4b7c-a021-9d15aaafb9c2",
+      "name": "パンチングマシンゲーム.mp4",
+      "size": 7419434,
+      "type": "video/mp4"
+    },
+    "order": 2,
+    "thumb": "thumbs/QTiMvsnXTE4YYowI0BB8.jpg",
+    "title": "超！パンチング(？)マシン",
+    "url": "https://unityroom.com/games/punchinggame"
+  },
+  {
+    "color": "#3b5bfd",
+    "controls": "AD、または矢印キー",
+    "description": "無限に続くクレーンゲームです。\nどこまでいけるかな",
+    "id": "91nehvgBz8wNAXoJh06z",
+    "order": 3,
+    "thumb": "thumbs/91nehvgBz8wNAXoJh06z.jpg",
+    "title": "無限クレーン",
+    "url": "https://unityroom.com/games/infi_kure-n"
+  }
+]
