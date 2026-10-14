@@ -1,0 +1,66 @@
+# 3時間ごとに Firestore のゲーム一覧と動画を、backup ブランチに保存する。
+# 内容が変わったときだけ記録が増える。11/4（日本時間）を過ぎたら何もしない。
+# 手で動かすときは GitHub の「Actions」→「バックアップ」→「Run workflow」。
+name: バックアップ
+
+on:
+  schedule:
+    - cron: "17 */3 * * *" # 3時間ごと（UTC。毎時0分は混むので17分にずらす）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency: backup
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 期限を過ぎていないか
+        id: period
+        run: |
+          if [ "$(TZ=Asia/Tokyo date +%F)" \> "2026-11-04" ]; then
+            echo "11/4 を過ぎたので、バックアップはしません"
+            echo "active=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "active=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.period.outputs.active == 'true'
+        with:
+          ref: main
+          path: site
+
+      - name: backup ブランチを用意する
+        if: steps.period.outputs.active == 'true'
+        env:
+          REPO_URL: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+        run: |
+          if git ls-remote --exit-code --heads "$REPO_URL" backup > /dev/null; then
+            git clone --quiet --branch backup --single-branch "$REPO_URL" data
+          else
+            mkdir data
+            git -C data init --quiet -b backup
+            git -C data remote add origin "$REPO_URL"
+          fi
+
+      - name: Firestore から書き出す
+        if: steps.period.outputs.active == 'true'
+        run: python3 site/tools/backup.py data
+
+      - name: 変わっていたら記録する
+        if: steps.period.outputs.active == 'true'
+        working-directory: data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "前回から変わっていません"
+            exit 0
+          fi
+          git commit --quiet -m "バックアップ $(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M')"
+          git push --quiet origin backup
+          echo "記録しました"
