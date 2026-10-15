@@ -53,5 +53,16 @@
     "thumb": "thumbs/91nehvgBz8wNAXoJh06z.jpg",
     "title": "無限クレーン",
     "url": "https://unityroom.com/games/infi_kure-n"
+  },
+  {
+    "color": "#3b5bfd",
+    "controls": "WASDキー：移動\nTabキー：画面切りかえ",
+    "description": "パックマン",
+    "id": "K0CmQBfZOcSZUpI2XXn1",
+    "media": null,
+    "order": 4,
+    "thumb": "thumbs/K0CmQBfZOcSZUpI2XXn1.jpg",
+    "title": "静大パックン",
+    "url": "https://play.unity.com/en/games/4c01dc8e-b2a1-436d-b70e-7cf8d7a9fc7a/6z2z5asn44or44od44kv44oz"
   }
 ]
