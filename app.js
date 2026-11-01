@@ -103,6 +103,15 @@ function card(game, i) {
   open.addEventListener("click", () => (admin ? openEditor(game) : openDetail(game)));
   li.append(open);
 
+  if (game.mouse) {
+    const badge = el("span", "mouse-badge");
+    badge.title = "マウス推奨";
+    badge.setAttribute("role", "img");
+    badge.setAttribute("aria-label", "マウス推奨");
+    badge.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="6" /><path d="M12 6.5v4" /></svg>';
+    li.append(badge);
+  }
+
   if (admin) {
     const tools = el("div", "card-tools");
     tools.append(
@@ -268,6 +277,7 @@ function openEditor(game) {
   form.elements.url.value = game?.url ?? "";
   form.elements.controls.value = game?.controls ?? "";
   form.elements.description.value = game?.description ?? "";
+  form.elements.mouse.checked = !!game?.mouse;
   setThumb(game?.thumb ?? "");
   setColor(themeColor(game));
   mediaFile = null;
@@ -287,7 +297,7 @@ function openEditor(game) {
 function formSnapshot() {
   const f = $("#edit-form").elements;
   return JSON.stringify([
-    f.title.value, f.url.value, f.controls.value, f.description.value,
+    f.title.value, f.url.value, f.controls.value, f.description.value, f.mouse.checked,
     thumbData, $("#color").value, mediaFile?.name ?? null, mediaRemoved,
   ]);
 }
@@ -357,6 +367,7 @@ $("#edit-form").addEventListener("submit", async (e) => {
     url,
     controls: form.elements.controls.value.trim(),
     description: form.elements.description.value.trim(),
+    mouse: form.elements.mouse.checked,
     thumb: thumbData,
     color: $("#color").value,
     order: latest ? latest.order : nextOrder(), // 並べ替えられていても、今の位置のまま
