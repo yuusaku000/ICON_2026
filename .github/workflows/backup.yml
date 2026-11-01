@@ -1,5 +1,5 @@
 # 3時間ごとに Firestore のゲーム一覧と動画を、backup ブランチに保存する。
-# 内容が変わったときだけ記録が増える。11/4（日本時間）を過ぎたら何もしない。
+# 内容が変わったときだけ記録が増える。11/10（日本時間）を過ぎたら何もしない。
 # 手で動かすときは GitHub の「Actions」→「バックアップ」→「Run workflow」。
 name: バックアップ
 
@@ -20,8 +20,8 @@ jobs:
       - name: 期限を過ぎていないか
         id: period
         run: |
-          if [ "$(TZ=Asia/Tokyo date +%F)" \> "2026-11-04" ]; then
-            echo "11/4 を過ぎたので、バックアップはしません"
+          if [ "$(TZ=Asia/Tokyo date +%F)" \> "2026-11-10" ]; then
+            echo "11/10 を過ぎたので、バックアップはしません"
             echo "active=false" >> "$GITHUB_OUTPUT"
           else
             echo "active=true" >> "$GITHUB_OUTPUT"

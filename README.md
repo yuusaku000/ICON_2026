@@ -53,7 +53,7 @@ python -m http.server 8765
 GitHub Actions（`.github/workflows/backup.yml`）が、3時間ごとに Firestore のゲーム一覧・サムネイル・動画を `backup` ブランチに保存します。
 
 - 内容が変わったときだけ記録が増え、過去の記録はすべて残ります
-- 2026/11/4（日本時間）を過ぎると、何もしなくなります。延ばすときは `backup.yml` の日付を変えます
+- 2026/11/10（日本時間）を過ぎると、何もしなくなります。延ばすときは `backup.yml` の日付を変えます
 - すぐに取りたいときは、GitHub の「Actions」→「バックアップ」→「Run workflow」
 
 戻すときは、`backup` ブランチの戻したい時点の中身をフォルダに取り出して、次を実行します。
