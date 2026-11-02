@@ -15,6 +15,7 @@
     "color": "#e5484d",
     "controls": "移動 W A S D（矢印キーも可）\n視点 マウス\n撃つ 左クリック\n構える 右クリック（長押し）\nダッシュ 左Shift\nジャンプ Space\n\n銃を隠す V\nミニマップ M\n一時停止 Esc\n\n▼ タイトル画面\n1 / 2 / 3 モードを選ぶ\nSpace 最初のモードで開始\nH 遊び方\n\n▼  ゲームオーバー後\nR もう一度\nT タイトルへ\n\n音量はタイトル画面の右下で調整できます。",
     "description": "インベーダーゲームを３Dにしました！\nマウス操作推奨です！！",
+    "hidden": false,
     "id": "aN0cYOt3hX1FgtOoAG35",
     "media": {
       "chunks": 7,
@@ -89,8 +90,10 @@
     "color": "#e5484d",
     "controls": "WASDキー\nマウス操作",
     "description": "自爆少年花子くんよりカモメ学園旧校舎3階女子トイレの再現3Dモデルです。未完成です。\n最初動けないため、一度クリックしていただけると動けるようになると思います。",
+    "hidden": false,
     "id": "eVJZoKDeDrtIglUaGqFa",
     "media": null,
+    "mouse": false,
     "order": 6,
     "thumb": "thumbs/eVJZoKDeDrtIglUaGqFa.jpg",
     "title": "地縛少年花子くん かもめ学園旧校舎3階女子トイレ",
