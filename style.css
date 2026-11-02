@@ -190,6 +190,28 @@ main { flex: 1; width: min(1200px, 100%); margin: 0 auto; padding: 0.5rem 1rem 2
 /* 並べ替えは左上（右上はマウス推奨の印に使う） */
 .card-tools { position: absolute; top: 0.5rem; left: 0.5rem; display: flex; gap: 0.35rem; }
 
+/* 非表示中のゲーム（編集中だけ見える） */
+.card.is-hidden .thumb { opacity: 0.4; filter: grayscale(0.7); }
+.card.is-hidden .card-title { color: var(--muted); }
+.hidden-veil {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  aspect-ratio: 16 / 9;
+  display: grid;
+  place-items: center;
+  pointer-events: none; /* 押したらカードが開くように */
+}
+.hidden-veil span {
+  padding: 0.3em 1em;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.75);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
 /* マウス推奨の印 */
 .mouse-badge {
   position: absolute;

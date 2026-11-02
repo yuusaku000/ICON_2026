@@ -77,7 +77,9 @@ function failLoad(message) {
 
 function render() {
   const grid = $("#grid");
-  grid.replaceChildren(...games.map(card));
+  // 非表示のゲームは、遊ぶ人の一覧には出さない（編集中は印付きで出す）
+  const shown = admin ? games : games.filter((g) => !g.hidden);
+  grid.replaceChildren(...shown.map(card));
   if (admin) grid.append(addCard());
   grid.classList.toggle("editing", admin);
 
@@ -86,7 +88,7 @@ function render() {
   $("#edit-link").hidden = admin;
   if (loadError) setStatus(loadError);
   else if (!loaded) setStatus("読み込み中…");
-  else setStatus(games.length || admin ? "" : "まだゲームがありません");
+  else setStatus(shown.length || admin ? "" : "まだゲームがありません");
 }
 
 function setStatus(text) {
@@ -95,13 +97,19 @@ function setStatus(text) {
 }
 
 function card(game, i) {
-  const li = el("li", "card");
+  const li = el("li", game.hidden ? "card is-hidden" : "card");
   applyTheme(li, themeColor(game));
   const open = el("button", "card-open");
   open.type = "button";
   open.append(thumb(game), el("span", "card-title", game.title));
   open.addEventListener("click", () => (admin ? openEditor(game) : openDetail(game)));
   li.append(open);
+
+  if (game.hidden) {
+    const veil = el("div", "hidden-veil");
+    veil.append(el("span", "", "非表示中"));
+    li.append(veil);
+  }
 
   if (game.mouse) {
     const badge = el("span", "mouse-badge");
@@ -278,6 +286,7 @@ function openEditor(game) {
   form.elements.controls.value = game?.controls ?? "";
   form.elements.description.value = game?.description ?? "";
   form.elements.mouse.checked = !!game?.mouse;
+  form.elements.hidden.checked = !!game?.hidden;
   setThumb(game?.thumb ?? "");
   setColor(themeColor(game));
   mediaFile = null;
@@ -297,7 +306,7 @@ function openEditor(game) {
 function formSnapshot() {
   const f = $("#edit-form").elements;
   return JSON.stringify([
-    f.title.value, f.url.value, f.controls.value, f.description.value, f.mouse.checked,
+    f.title.value, f.url.value, f.controls.value, f.description.value, f.mouse.checked, f.hidden.checked,
     thumbData, $("#color").value, mediaFile?.name ?? null, mediaRemoved,
   ]);
 }
@@ -368,6 +377,7 @@ $("#edit-form").addEventListener("submit", async (e) => {
     controls: form.elements.controls.value.trim(),
     description: form.elements.description.value.trim(),
     mouse: form.elements.mouse.checked,
+    hidden: form.elements.hidden.checked,
     thumb: thumbData,
     color: $("#color").value,
     order: latest ? latest.order : nextOrder(), // 並べ替えられていても、今の位置のまま
