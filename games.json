@@ -98,5 +98,44 @@
     "thumb": "thumbs/eVJZoKDeDrtIglUaGqFa.jpg",
     "title": "地縛少年花子くん かもめ学園旧校舎3階女子トイレ",
     "url": "https://unityroom.com/games/dfegrdhtfjgkhjralgakrv"
+  },
+  {
+    "color": "#5b6070",
+    "controls": "マウスで動かす\nレベルアップはクリックでボタン押す",
+    "description": "マウスで敵をよけ続ける\nレベルアップするともっと耐久出来るようになります",
+    "hidden": false,
+    "id": "xoUGbdvBpufZ6TvLnmtc",
+    "media": null,
+    "mouse": true,
+    "order": 7,
+    "thumb": "thumbs/xoUGbdvBpufZ6TvLnmtc.jpg",
+    "title": "避ける3",
+    "url": "https://unityroom.com/games/yokeyeokyoeyokeyokeyokeyoyoykeoyeyo"
+  },
+  {
+    "color": "#ff0000",
+    "controls": "!がでたらクリック!",
+    "description": "連続で敵を切る!!",
+    "hidden": false,
+    "id": "9gj8QLtQtCxRNEQRdgnE",
+    "media": null,
+    "mouse": false,
+    "order": 8,
+    "thumb": "thumbs/9gj8QLtQtCxRNEQRdgnE.jpg",
+    "title": "刹那の連切り",
+    "url": "https://unityroom.com/games/hgfugyibgi"
+  },
+  {
+    "color": "#ffffff",
+    "controls": "WASD　キーの入力",
+    "description": "パズルゲーム　どこで求められた入力を行うことが出来るか",
+    "hidden": false,
+    "id": "plvTMCzEMJzAh3bdoG1W",
+    "media": null,
+    "mouse": false,
+    "order": 9,
+    "thumb": "thumbs/plvTMCzEMJzAh3bdoG1W.jpg",
+    "title": "key.combo",
+    "url": "https://unityroom.com/games/ueuesitasitamigihidari"
   }
 ]
