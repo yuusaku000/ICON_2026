@@ -137,5 +137,18 @@
     "thumb": "thumbs/plvTMCzEMJzAh3bdoG1W.jpg",
     "title": "key.combo",
     "url": "https://unityroom.com/games/ueuesitasitamigihidari"
+  },
+  {
+    "color": "#f5b800",
+    "controls": "ドラッグアンドドロップ : ボールを飛ばす\nスペースキー : カメラ範囲変更",
+    "description": "画面上をクリックし、長押ししたまま引き伸ばして放つ。\nこれを何度も繰り返しボールを縦横無尽に飛ばす！\nコインを全て集めたらクリアだ！！",
+    "hidden": false,
+    "id": "jn7Pwh4I2cIciyR0tXlm",
+    "media": null,
+    "mouse": true,
+    "order": 10,
+    "thumb": "thumbs/jn7Pwh4I2cIciyR0tXlm.jpg",
+    "title": "ぴょこぴょこコイン集め",
+    "url": "https://scratch.mit.edu/projects/1335209140/"
   }
 ]
