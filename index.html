@@ -107,6 +107,16 @@
             <p class="hint">チェックすると、一覧のカードの右上にマウスのマークが付きます</p>
           </div>
           <div class="field">
+            <span id="e-diff-label" class="field-label">難易度</span>
+            <p class="hint">一覧のカードのサムネイルに★で表示されます。「つけない」にすると何も出ません</p>
+            <div class="segments" role="radiogroup" aria-labelledby="e-diff-label">
+              <label class="segment"><input type="radio" name="difficulty" value="0"><span>つけない</span></label>
+              <label class="segment"><input type="radio" name="difficulty" value="1"><span>★1</span></label>
+              <label class="segment"><input type="radio" name="difficulty" value="2"><span>★2</span></label>
+              <label class="segment"><input type="radio" name="difficulty" value="3"><span>★3</span></label>
+            </div>
+          </div>
+          <div class="field">
             <label class="check"><input id="e-hidden" name="hidden" type="checkbox"> 一覧に表示しない（工事中・手直し中など）</label>
             <p class="hint">チェックすると、遊ぶ人の一覧に出なくなります。編集中の画面には「非表示中」の印付きで残るので、直したらチェックを外してください</p>
           </div>

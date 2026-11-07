@@ -105,6 +105,9 @@ function card(game, i) {
   open.addEventListener("click", () => (admin ? openEditor(game) : openDetail(game)));
   li.append(open);
 
+  const level = difficultyOf(game);
+  if (level) li.append(difficultyBadge(level));
+
   if (game.hidden) {
     const veil = el("div", "hidden-veil");
     veil.append(el("span", "", "非表示中"));
@@ -129,6 +132,22 @@ function card(game, i) {
     li.append(tools);
   }
   return li;
+}
+
+// 難易度は 0（つけない）か 1〜3。まだ設定していないゲームは★1
+function difficultyOf(game) {
+  return [0, 1, 2, 3].includes(game?.difficulty) ? game.difficulty : 1;
+}
+
+function difficultyBadge(level) {
+  const frame = el("div", "difficulty");
+  const stars = el("span", "stars");
+  stars.setAttribute("role", "img");
+  stars.setAttribute("aria-label", `難易度 ★${level}`);
+  stars.title = `難易度 ★${level}`;
+  stars.append("★".repeat(level), el("span", "stars-empty", "★".repeat(3 - level)));
+  frame.append(stars);
+  return frame;
 }
 
 function addCard() {
@@ -287,6 +306,7 @@ function openEditor(game) {
   form.elements.description.value = game?.description ?? "";
   form.elements.mouse.checked = !!game?.mouse;
   form.elements.hidden.checked = !!game?.hidden;
+  form.elements.difficulty.value = String(difficultyOf(game));
   setThumb(game?.thumb ?? "");
   setColor(themeColor(game));
   mediaFile = null;
@@ -306,7 +326,7 @@ function openEditor(game) {
 function formSnapshot() {
   const f = $("#edit-form").elements;
   return JSON.stringify([
-    f.title.value, f.url.value, f.controls.value, f.description.value, f.mouse.checked, f.hidden.checked,
+    f.title.value, f.url.value, f.controls.value, f.description.value, f.mouse.checked, f.hidden.checked, f.difficulty.value,
     thumbData, $("#color").value, mediaFile?.name ?? null, mediaRemoved,
   ]);
 }
@@ -378,6 +398,7 @@ $("#edit-form").addEventListener("submit", async (e) => {
     description: form.elements.description.value.trim(),
     mouse: form.elements.mouse.checked,
     hidden: form.elements.hidden.checked,
+    difficulty: Number(form.elements.difficulty.value),
     thumb: thumbData,
     color: $("#color").value,
     order: latest ? latest.order : nextOrder(), // 並べ替えられていても、今の位置のまま

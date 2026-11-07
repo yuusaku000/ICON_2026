@@ -190,6 +190,30 @@ main { flex: 1; width: min(1200px, 100%); margin: 0 auto; padding: 0.5rem 1rem 2
 /* 並べ替えは左上（右上はマウス推奨の印に使う） */
 .card-tools { position: absolute; top: 0.5rem; left: 0.5rem; display: flex; gap: 0.35rem; }
 
+/* 難易度の星（サムネイルの左下） */
+.difficulty {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: flex-end;
+  padding: 0.5rem;
+  pointer-events: none; /* 押したらカードが開くように */
+}
+.stars {
+  padding: 0.1em 0.55em;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.75);
+  color: #ffc53d;
+  font-size: 1.05rem;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  pointer-events: auto; /* 星に乗せたときの説明を出す */
+}
+.stars-empty { color: rgb(255 255 255 / 0.3); }
+
 /* 非表示中のゲーム（編集中だけ見える） */
 .card.is-hidden .thumb { opacity: 0.4; filter: grayscale(0.7); }
 .card.is-hidden .card-title { color: var(--muted); }
@@ -510,6 +534,24 @@ main { flex: 1; width: min(1200px, 100%); margin: 0 auto; padding: 0.5rem 1rem 2
   font-weight: 700;
 }
 .form [aria-invalid="true"] { border-color: var(--danger); box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger) 35%, transparent); }
+
+.segments { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.form .segment { flex-direction: row; cursor: pointer; }
+.form .segment input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  opacity: 0;
+}
+.segment span {
+  padding: 0.35em 0.9em;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px var(--border);
+  font-weight: 600;
+}
+.segment input:checked + span { background: var(--accent); color: var(--accent-text); box-shadow: none; }
+.segment input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
 
 .form .check {
   flex-direction: row;
